@@ -1,0 +1,28 @@
+storage:
+  dsn: "postgresql+psycopg2://dqtk:dqtk@postgres:5432/dqtk"
+
+adapters:
+  main:
+    type: postgres
+    dsn: "postgresql+psycopg2://dqtk:dqtk@postgres:5432/dqtk"
+
+notifiers: []
+# Uncomment to alert on failures/warnings during the demo:
+# notifiers:
+#   - type: slack
+#     webhook_url: "https://hooks.slack.com/services/XXX/YYY/ZZZ"
+
+tables:
+  - name: demo.orders
+    adapter: main
+    checks:
+      - type: freshness
+        column: updated_at
+        max_age_minutes: 10
+      - type: row_count
+        max_pct_change: 0.3
+        min_history: 3
+      - type: null_rate
+        column: email
+        max_null_rate: 0.02
+      - type: schema_drift

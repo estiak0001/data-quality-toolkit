@@ -1,0 +1,50 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: dqtk_postgres
+    environment:
+      POSTGRES_USER: dqtk
+      POSTGRES_PASSWORD: dqtk
+      POSTGRES_DB: dqtk
+    ports:
+      - "15432:5432"
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+      - ./demo/seed.sql:/docker-entrypoint-initdb.d/01_seed.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U dqtk"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  dqtk-scheduler:
+    build: .
+    container_name: dqtk_scheduler
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./demo:/app/demo
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        while true; do
+          echo "--- running dqtk checks $(date -u +%FT%TZ) ---";
+          dqtk run --config demo/config.yml -v || true;
+          sleep 60;
+        done
+
+  dashboard:
+    build: .
+    container_name: dqtk_dashboard
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DQTK_STORAGE_DSN: "postgresql+psycopg2://dqtk:dqtk@postgres:5432/dqtk"
+    ports:
+      - "8501:8501"
+    entrypoint: ["streamlit", "run", "dashboard/app.py", "--server.address=0.0.0.0"]
+
+volumes:
+  pg_data:
