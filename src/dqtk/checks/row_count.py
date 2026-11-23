@@ -55,6 +55,7 @@ class RowCountCheck(Check):
                 current=current,
                 baseline=baseline,
                 pct_change=pct_change,
+                threshold=self.max_pct_change,
                 stddev=spread,
             )
         return self._result(
@@ -65,4 +66,5 @@ class RowCountCheck(Check):
             current=current,
             baseline=baseline,
             pct_change=pct_change,
+            threshold=self.max_pct_change,
         )

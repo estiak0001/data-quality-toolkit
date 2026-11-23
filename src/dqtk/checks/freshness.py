@@ -35,6 +35,7 @@ class FreshnessCheck(Check):
                 f"{table}.{self.column} is {age_minutes:.1f}m stale "
                 f"(threshold {self.max_age_minutes}m)",
                 age_minutes=age_minutes,
+                threshold_minutes=self.max_age_minutes,
                 latest=str(latest),
             )
         return self._result(
@@ -42,5 +43,6 @@ class FreshnessCheck(Check):
             Status.PASS,
             f"{table}.{self.column} is fresh ({age_minutes:.1f}m old)",
             age_minutes=age_minutes,
+            threshold_minutes=self.max_age_minutes,
             latest=str(latest),
         )

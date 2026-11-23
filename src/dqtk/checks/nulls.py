@@ -24,10 +24,12 @@ class NullRateCheck(Check):
                 f"{table}.{self.column} null rate {rate:.2%} exceeds "
                 f"threshold {self.max_null_rate:.2%}",
                 null_rate=rate,
+                threshold=self.max_null_rate,
             )
         return self._result(
             table,
             Status.PASS,
             f"{table}.{self.column} null rate {rate:.2%} within threshold",
             null_rate=rate,
+            threshold=self.max_null_rate,
         )
